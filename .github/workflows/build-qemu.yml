@@ -1,0 +1,60 @@
+name: Build QEMU-Wasm
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout emulator website
+        uses: actions/checkout@v4
+
+      - name: Clone QEMU-Wasm
+        run: |
+          git clone --depth 1 https://github.com/ktock/qemu-wasm.git qemu-wasm
+
+      - name: Build QEMU-Wasm environment
+        run: |
+          cd qemu-wasm
+          docker build --progress=plain -t build-qemu-wasm .
+
+      - name: Start build container
+        run: |
+          docker run --rm -d \
+            --name build-qemu-wasm \
+            -v "$GITHUB_WORKSPACE/qemu-wasm:/qemu" \
+            build-qemu-wasm
+
+      - name: Configure QEMU
+        run: |
+          docker exec build-qemu-wasm emconfigure /qemu/configure \
+            --static \
+            --target-list=aarch64-softmmu \
+            --cpu=wasm32 \
+            --cross-prefix= \
+            --without-default-features \
+            --enable-system \
+            --with-coroutine=fiber \
+            --enable-virtfs \
+            --extra-cflags="-O3 -g -Wno-error=unused-command-line-argument -matomics -mbulk-memory -DNDEBUG -DG_DISABLE_ASSERT -D_GNU_SOURCE -sASYNCIFY=1 -pthread -sPROXY_TO_PTHREAD=1 -sFORCE_FILESYSTEM -sALLOW_TABLE_GROWTH -sTOTAL_MEMORY=2300MB -sWASM_BIGINT -sMALLOC=mimalloc -sEXPORT_ES6=1 -sASYNCIFY_IMPORTS=ffi_call_js" \
+            --extra-cxxflags="-O3 -g -Wno-error=unused-command-line-argument -matomics -mbulk-memory -DNDEBUG -DG_DISABLE_ASSERT -D_GNU_SOURCE -sASYNCIFY=1 -pthread -sPROXY_TO_PTHREAD=1 -sFORCE_FILESYSTEM -sALLOW_TABLE_GROWTH -sTOTAL_MEMORY=2300MB -sWASM_BIGINT -sMALLOC=mimalloc -sEXPORT_ES6=1 -sASYNCIFY_IMPORTS=ffi_call_js" \
+            --extra-ldflags="-sEXPORTED_RUNTIME_METHODS=getTempRet0,setTempRet0,addFunction,removeFunction,TTY,FS"
+
+      - name: Build QEMU
+        run: |
+          docker exec build-qemu-wasm \
+            emmake make -j$(nproc) qemu-system-aarch64
+
+      - name: Copy QEMU files
+        run: |
+          mkdir -p qemu-build
+          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64.js qemu-build/
+          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64.wasm qemu-build/
+
+      - name: Upload QEMU build
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-aarch64-wasm
+          path: qemu-build/
