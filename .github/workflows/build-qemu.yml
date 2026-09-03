@@ -51,7 +51,7 @@ jobs:
       - name: Copy QEMU files
         run: |
           mkdir -p qemu-build
-          docker exec build-qemu-wasm sh -c 'find /qemu/build -type f -print | sort'
+          docker exec build-qemu-wasm sh -c 'find /qemu -type f -print | sort | tail -200'
           docker exec build-qemu-wasm sh -c 'find /qemu/build -type f -exec cp {} /tmp/ \;'
           docker cp build-qemu-wasm:/tmp/. qemu-build/
 
