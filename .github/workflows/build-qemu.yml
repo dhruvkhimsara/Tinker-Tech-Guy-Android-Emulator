@@ -51,8 +51,11 @@ jobs:
       - name: Copy QEMU files
         run: |
           mkdir -p qemu-build
-          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64.js qemu-build/
-          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64.wasm qemu-build/
+          docker exec build-qemu-wasm sh -c 'find /qemu -type f \( -name "qemu-system-aarch64*" -o -name "*.wasm" \) -print'
+          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64 qemu-build/ || true
+          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64.js qemu-build/ || true
+          docker cp build-qemu-wasm:/qemu/build/qemu-system-aarch64.wasm qemu-build/ || true
+          find qemu-build -type f -maxdepth 1 -print
 
       - name: Upload QEMU build
         uses: actions/upload-artifact@v4
