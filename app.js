@@ -1,6 +1,7 @@
 console.log("Tinker Tech Guy Android Emulator starting...");
 
 const script = document.createElement("script");
+script.type = "module";
 script.src = "./qemu/out.js";
 
 script.onload = () => {
