@@ -5,7 +5,7 @@ import initEmscriptenModule from "./qemu/qemu-system-aarch64.js";
 console.log("QEMU-Wasm module imported!");
 
 const Module = {
-    noInitialRun: true,
+    noInitialRun: false,
 
     mainScriptUrlOrBlob:
         new URL("./qemu/qemu-system-aarch64.js", window.location.href).href,
