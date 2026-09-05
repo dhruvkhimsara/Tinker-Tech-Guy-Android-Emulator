@@ -1,11 +1,12 @@
 console.log("Tinker Tech Guy Android Emulator starting...");
 
-import initEmscriptenModule from "./qemu/out.js";
+import initEmscriptenModule from "./qemu/qemu-system-aarch64.js";
 
 console.log("QEMU-Wasm module imported!");
 
 const Module = {
-    noInitialRun: true
+    noInitialRun: true,
+    mainScriptUrlOrBlob: new URL("./qemu/qemu-system-aarch64.js", window.location.href).href
 };
 
 (async () => {
