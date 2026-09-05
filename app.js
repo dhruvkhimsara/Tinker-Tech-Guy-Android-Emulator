@@ -11,7 +11,7 @@ const Module = {
         new URL("./qemu/qemu-system-aarch64.js", window.location.href).href,
 
     arguments: [
-        "-machine", "type=ranchu",
+        "-machine", "type=virt",
         "-cpu", "cortex-a57",
         "-m", "4096",
         "-smp", "4",
