@@ -22,7 +22,7 @@ const Module = {
         "-append",
         "console=ttyAMA0,38400 keep_bootcon earlyprintk=ttyAMA0",
 
-        "-serial", "stdio",
+        "-serial", "mon:stdio",
         "-nographic"
     ]
 };
