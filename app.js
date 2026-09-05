@@ -13,7 +13,7 @@ const Module = {
     arguments: [
         "-machine", "type=virt",
         "-cpu", "cortex-a57",
-        "-m", "4096",
+        "-m", "2048",
         "-smp", "4",
 
         "-kernel", "/qemu/kernel-ranchu",
