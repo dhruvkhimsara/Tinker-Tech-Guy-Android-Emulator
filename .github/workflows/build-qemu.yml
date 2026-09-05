@@ -14,6 +14,7 @@ jobs:
       - name: Clone QEMU-Wasm
         run: |
           git clone --depth 1 https://github.com/ktock/qemu-wasm.git qemu-wasm
+
           sed -i "s#https://zlib.net/zlib-\$ZLIB_VERSION.tar.xz#https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz#; s#tar xJC /zlib#tar xzC /zlib#" qemu-wasm/Dockerfile
 
       - name: Build QEMU-Wasm environment
@@ -36,6 +37,7 @@ jobs:
             --cpu=wasm32 \
             --cross-prefix= \
             --without-default-features \
+            --enable-fdt \
             --enable-system \
             --with-coroutine=fiber \
             --enable-virtfs \
@@ -51,9 +53,16 @@ jobs:
       - name: Copy QEMU files
         run: |
           mkdir -p qemu-build
-          docker cp build-qemu-wasm:/build/qemu-system-aarch64 qemu-build/out.js
-          docker cp build-qemu-wasm:/build/qemu-system-aarch64.wasm qemu-build/qemu-system-aarch64.wasm
-          docker cp build-qemu-wasm:/build/qemu-system-aarch64.worker.js qemu-build/qemu-system-aarch64.worker.js
+
+          docker cp build-qemu-wasm:/build/qemu-system-aarch64 \
+            qemu-build/out.js
+
+          docker cp build-qemu-wasm:/build/qemu-system-aarch64.wasm \
+            qemu-build/qemu-system-aarch64.wasm
+
+          docker cp build-qemu-wasm:/build/qemu-system-aarch64.worker.js \
+            qemu-build/qemu-system-aarch64.worker.js
+
           ls -lh qemu-build/
 
       - name: Upload QEMU build
