@@ -1,15 +1,18 @@
 console.log("Tinker Tech Guy Android Emulator starting...");
 
-const script = document.createElement("script");
-script.type = "module";
-script.src = "./qemu/out.js";
+import initEmscriptenModule from "./qemu/out.js";
 
-script.onload = () => {
-    console.log("QEMU-Wasm JavaScript loaded!");
+console.log("QEMU-Wasm module imported!");
+
+const Module = {
+    noInitialRun: true
 };
 
-script.onerror = (error) => {
-    console.error("Failed to load QEMU-Wasm:", error);
-};
-
-document.body.appendChild(script);
+(async () => {
+    try {
+        const instance = await initEmscriptenModule(Module);
+        console.log("QEMU-Wasm initialized!", instance);
+    } catch (error) {
+        console.error("QEMU-Wasm initialization failed:", error);
+    }
+})();
